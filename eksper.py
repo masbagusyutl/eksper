@@ -31,26 +31,37 @@ def send_random_message(min_value, max_value):
     
     return selected_token_index, token_count, status_code
 
-# Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore)
+# Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore) dengan hitungan mundur
 def wait_until_target_time(hour):
-    now = datetime.now()
-    target_time = now.replace(hour=hour, minute=0, second=0, microsecond=0)
-    if now > target_time:
-        target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
-    time_to_wait = (target_time - now).total_seconds()
-    print(f"Menunggu hingga jam {hour}:00 WIB...")
-    time.sleep(time_to_wait)
+    while True:
+        now = datetime.now()
+        target_time = now.replace(hour=hour, minute=0, second=0, microsecond=0)
+        if now > target_time:
+            target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
+        time_to_wait = (target_time - now).total_seconds()
+        
+        hours, remainder = divmod(time_to_wait, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        print(f"Menunggu hingga jam {hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
+        
+        time.sleep(1)
+        
+        if time_to_wait <= 0:
+            break
 
 # Fungsi untuk menjalankan tugas sesuai dengan jadwal
-def run_task():
+def run_task(min_value, max_value):
     while True:
         wait_until_target_time(2)  # Menunggu hingga jam 2 pagi
-        index, total_tokens, status = send_random_message(3000, 4000)
+        index, total_tokens, status = send_random_message(min_value, max_value)
         print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {total_tokens} akun. Status Code: {status}")
         
         wait_until_target_time(14)  # Menunggu hingga jam 2 sore
-        index, total_tokens, status = send_random_message(3000, 4000)
+        index, total_tokens, status = send_random_message(min_value, max_value)
         print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {total_tokens} akun. Status Code: {status}")
 
-# Menjalankan tugas
-run_task()
+# Menjalankan tugas dengan input dari pengguna
+min_value = int(input("Masukkan nilai minimum untuk pesan acak: "))
+max_value = int(input("Masukkan nilai maksimum untuk pesan acak: "))
+run_task(min_value, max_value)
+
