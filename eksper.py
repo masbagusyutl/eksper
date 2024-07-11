@@ -16,8 +16,12 @@ def send_message(token, message):
         "token": token,
         "message": str(message)
     }
-    response = requests.post(url, json=payload)
-    return response.status_code
+    try:
+        response = requests.post(url, json=payload)
+        return response.status_code
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending message: {e}")
+        return None
 
 # Fungsi untuk mengirimkan pesan dengan nilai acak antara min_value dan max_value untuk setiap akun
 def send_random_messages_for_all_accounts(min_value, max_value):
@@ -33,22 +37,35 @@ def send_random_messages_for_all_accounts(min_value, max_value):
                 break
         
         status_code = send_message(token, random_message)
-        print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {token_count} akun. Pesan: {random_message}. Status Code: {status_code}")
+        if status_code == 200:
+            print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {token_count} akun. Pesan: {random_message}. Status Code: {status_code}")
+        else:
+            print(f"Gagal mengirim pesan dengan token ke-{index + 1} dari total {token_count} akun. Pesan: {random_message}. Status Code: {status_code}")
 
 # Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore) dengan hitungan mundur
 def wait_until_target_time(hour):
     while True:
-        now = datetime.now()
-        target_time = now.replace(hour=hour, minute=0, second=0, microsecond=0)
-        if now > target_time:
+        now_utc = datetime.utcnow()
+        now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
+        target_time = now_wib.replace(hour=hour, minute=0, second=0, microsecond=0)
+        if now_wib > target_time:
             target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
-        time_to_wait = (target_time - now).total_seconds()
+        time_to_wait = (target_time - now_wib).total_seconds() + 180  # Tambahkan 3 menit (180 detik) ke waktu tunggu
         
+        if time_to_wait > 3600:  # Jika waktu tunggu lebih dari 1 jam, tidur selama 1 jam
+            time.sleep(3600)
+        elif time_to_wait > 60:  # Jika waktu tunggu lebih dari 1 menit, tidur selama 1 menit
+            time.sleep(60)
+        else:  # Jika waktu tunggu kurang dari 1 menit, tidur selama 1 detik
+            time.sleep(1)
+        
+        # Hitungan mundur ditampilkan setiap detik
+        now_utc = datetime.utcnow()
+        now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
+        time_to_wait = (target_time - now_wib).total_seconds()
         hours, remainder = divmod(time_to_wait, 3600)
         minutes, seconds = divmod(remainder, 60)
         print(f"Menunggu hingga jam {hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
-        
-        time.sleep(1)
         
         if time_to_wait <= 0:
             break
@@ -56,10 +73,10 @@ def wait_until_target_time(hour):
 # Fungsi untuk menjalankan tugas sesuai dengan jadwal
 def run_task(min_value, max_value):
     while True:
-        wait_until_target_time(19)  # Menunggu hingga jam 2 pagi
+        wait_until_target_time(2)  # Menunggu hingga jam 2 pagi WIB
         send_random_messages_for_all_accounts(min_value, max_value)
         
-        wait_until_target_time(7)  # Menunggu hingga jam 2 sore
+        wait_until_target_time(14)  # Menunggu hingga jam 2 sore WIB
         send_random_messages_for_all_accounts(min_value, max_value)
 
 # Menjalankan tugas dengan input dari pengguna
