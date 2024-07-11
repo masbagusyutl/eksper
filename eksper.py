@@ -50,7 +50,7 @@ def wait_until_target_time(hour):
         target_time = now_wib.replace(hour=hour, minute=0, second=0, microsecond=0)
         if now_wib > target_time:
             target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
-        time_to_wait = (target_time - now_wib).total_seconds() + 180  # Tambahkan 3 menit (180 detik) ke waktu tunggu
+        time_to_wait = (target_time - now_wib).total_seconds()
         
         if time_to_wait > 3600:  # Jika waktu tunggu lebih dari 1 jam, tidur selama 1 jam
             time.sleep(3600)
@@ -74,9 +74,13 @@ def wait_until_target_time(hour):
 def run_task(min_value, max_value):
     while True:
         wait_until_target_time(2)  # Menunggu hingga jam 2 pagi WIB
+        print("\nMenunggu tambahan 3 menit...\n")
+        time.sleep(180)  # Menunggu tambahan 3 menit
         send_random_messages_for_all_accounts(min_value, max_value)
         
         wait_until_target_time(14)  # Menunggu hingga jam 2 sore WIB
+        print("\nMenunggu tambahan 3 menit...\n")
+        time.sleep(180)  # Menunggu tambahan 3 menit
         send_random_messages_for_all_accounts(min_value, max_value)
 
 # Menjalankan tugas dengan input dari pengguna
