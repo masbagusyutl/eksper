@@ -56,10 +56,10 @@ def wait_until_target_time(hour):
 # Fungsi untuk menjalankan tugas sesuai dengan jadwal
 def run_task(min_value, max_value):
     while True:
-        wait_until_target_time(2)  # Menunggu hingga jam 2 pagi
+        wait_until_target_time(19)  # Menunggu hingga jam 2 pagi
         send_random_messages_for_all_accounts(min_value, max_value)
         
-        wait_until_target_time(14)  # Menunggu hingga jam 2 sore
+        wait_until_target_time(7)  # Menunggu hingga jam 2 sore
         send_random_messages_for_all_accounts(min_value, max_value)
 
 # Menjalankan tugas dengan input dari pengguna
