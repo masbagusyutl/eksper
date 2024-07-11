@@ -45,11 +45,12 @@ def send_random_messages_for_all_accounts(min_value, max_value):
 # Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore) dengan hitungan mundur
 def wait_until_target_time(hour):
     while True:
-        now_utc = datetime.utcnow()
-        target_time = now_utc.replace(hour=hour, minute=0, second=0, microsecond=0)
-        if now_utc > target_time:
+        now_utc = datetime.now()
+        now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
+        target_time = now_wib.replace(hour=hour, minute=0, second=0, microsecond=0)
+        if now_wib > target_time:
             target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
-        time_to_wait = (target_time - now_utc).total_seconds()
+        time_to_wait = (target_time - now_wib).total_seconds()
         
         if time_to_wait > 3600:  # Jika waktu tunggu lebih dari 1 jam, tidur selama 1 jam
             time.sleep(3600)
@@ -59,11 +60,12 @@ def wait_until_target_time(hour):
             time.sleep(1)
         
         # Hitungan mundur ditampilkan setiap detik
-        now_utc = datetime.utcnow()
-        time_to_wait = (target_time - now_utc).total_seconds()
+        now_utc = datetime.now()
+        now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
+        time_to_wait = (target_time - now_wib).total_seconds()
         hours, remainder = divmod(time_to_wait, 3600)
         minutes, seconds = divmod(remainder, 60)
-        print(f"Menunggu hingga jam {hour}:00 UTC... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
+        print(f"Menunggu hingga jam {hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
         
         if time_to_wait <= 0:
             break
@@ -71,12 +73,12 @@ def wait_until_target_time(hour):
 # Fungsi untuk menjalankan tugas sesuai dengan jadwal
 def run_task(min_value, max_value):
     while True:
-        wait_until_target_time(2)  # Menunggu hingga jam 2 pagi UTC
+        wait_until_target_time(2)  # Menunggu hingga jam 2 pagi WIB
         print("\nMenunggu tambahan 3 menit...\n")
         time.sleep(180)  # Menunggu tambahan 3 menit
         send_random_messages_for_all_accounts(min_value, max_value)
         
-        wait_until_target_time(14)  # Menunggu hingga jam 2 sore UTC
+        wait_until_target_time(14)  # Menunggu hingga jam 2 sore WIB
         print("\nMenunggu tambahan 3 menit...\n")
         time.sleep(180)  # Menunggu tambahan 3 menit
         send_random_messages_for_all_accounts(min_value, max_value)
@@ -85,4 +87,3 @@ def run_task(min_value, max_value):
 min_value = int(input("Masukkan nilai minimum untuk pesan acak: "))
 max_value = int(input("Masukkan nilai maksimum untuk pesan acak: "))
 run_task(min_value, max_value)
-
