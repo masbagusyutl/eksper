@@ -48,18 +48,25 @@ def wait_until_target_time(hour):
         now_utc = datetime.utcnow()
         now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
         target_time = now_wib.replace(hour=hour, minute=0, second=0, microsecond=0)
+        
         if now_wib > target_time:
             target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
+        
         time_to_wait = (target_time - now_wib).total_seconds()
         
-        # Hitungan mundur ditampilkan setiap detik
-        now_utc = datetime.utcnow()
-        now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
-        time_to_wait = (target_time - now_wib).total_seconds()
-        hours, remainder = divmod(time_to_wait, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        print(f"Menunggu hingga jam {hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
-        
+        while time_to_wait > 0:
+            # Hitungan mundur ditampilkan setiap detik
+            hours, remainder = divmod(time_to_wait, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            print(f"Menunggu hingga jam {hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
+            time.sleep(1)
+            
+            now_utc = datetime.utcnow()
+            now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
+            time_to_wait = (target_time - now_wib).total_seconds()
+
+        print(f"Menunggu hingga jam {hour}:00 WIB... 0 jam 0 menit 0 detik lagi.                    ")
+
         if time_to_wait <= 0:
             break
 
