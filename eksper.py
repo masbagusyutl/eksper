@@ -19,17 +19,21 @@ def send_message(token, message):
     response = requests.post(url, json=payload)
     return response.status_code
 
-# Fungsi untuk mengirimkan pesan dengan nilai acak antara min_value dan max_value
-def send_random_message(min_value, max_value):
+# Fungsi untuk mengirimkan pesan dengan nilai acak antara min_value dan max_value untuk setiap akun
+def send_random_messages_for_all_accounts(min_value, max_value):
     tokens = read_token()
     token_count = len(tokens)
-    selected_token_index = random.randint(0, token_count - 1)
-    selected_token = tokens[selected_token_index]
-    random_message = random.randint(min_value, max_value)
-    
-    status_code = send_message(selected_token, random_message)
-    
-    return selected_token_index, token_count, status_code
+    sent_messages = set()
+
+    for index, token in enumerate(tokens):
+        while True:
+            random_message = random.randint(min_value, max_value)
+            if random_message not in sent_messages:
+                sent_messages.add(random_message)
+                break
+        
+        status_code = send_message(token, random_message)
+        print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {token_count} akun. Pesan: {random_message}. Status Code: {status_code}")
 
 # Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore) dengan hitungan mundur
 def wait_until_target_time(hour):
@@ -53,15 +57,12 @@ def wait_until_target_time(hour):
 def run_task(min_value, max_value):
     while True:
         wait_until_target_time(2)  # Menunggu hingga jam 2 pagi
-        index, total_tokens, status = send_random_message(min_value, max_value)
-        print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {total_tokens} akun. Status Code: {status}")
+        send_random_messages_for_all_accounts(min_value, max_value)
         
         wait_until_target_time(14)  # Menunggu hingga jam 2 sore
-        index, total_tokens, status = send_random_message(min_value, max_value)
-        print(f"Pesan berhasil dikirim dengan token ke-{index + 1} dari total {total_tokens} akun. Status Code: {status}")
+        send_random_messages_for_all_accounts(min_value, max_value)
 
 # Menjalankan tugas dengan input dari pengguna
 min_value = int(input("Masukkan nilai minimum untuk pesan acak: "))
 max_value = int(input("Masukkan nilai maksimum untuk pesan acak: "))
 run_task(min_value, max_value)
-
