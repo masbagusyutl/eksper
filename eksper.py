@@ -52,13 +52,6 @@ def wait_until_target_time(hour):
             target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
         time_to_wait = (target_time - now_wib).total_seconds()
         
-        if time_to_wait > 3600:  # Jika waktu tunggu lebih dari 1 jam, tidur selama 1 jam
-            time.sleep(3600)
-        elif time_to_wait > 60:  # Jika waktu tunggu lebih dari 1 menit, tidur selama 1 menit
-            time.sleep(60)
-        else:  # Jika waktu tunggu kurang dari 1 menit, tidur selama 1 detik
-            time.sleep(1)
-        
         # Hitungan mundur ditampilkan setiap detik
         now_utc = datetime.now()
         now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
