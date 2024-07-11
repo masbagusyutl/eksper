@@ -45,7 +45,7 @@ def send_random_messages_for_all_accounts(min_value, max_value):
 # Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore) dengan hitungan mundur
 def wait_until_target_time(hour):
     while True:
-        now_utc = datetime.now()
+        now_utc = datetime.utcnow()
         now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
         target_time = now_wib.replace(hour=hour, minute=0, second=0, microsecond=0)
         if now_wib > target_time:
@@ -53,7 +53,7 @@ def wait_until_target_time(hour):
         time_to_wait = (target_time - now_wib).total_seconds()
         
         # Hitungan mundur ditampilkan setiap detik
-        now_utc = datetime.now()
+        now_utc = datetime.utcnow()
         now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
         time_to_wait = (target_time - now_wib).total_seconds()
         hours, remainder = divmod(time_to_wait, 3600)
