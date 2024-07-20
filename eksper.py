@@ -43,42 +43,39 @@ def send_random_messages_for_all_accounts(min_value, max_value):
             print(f"Gagal mengirim pesan dengan token ke-{index + 1} dari total {token_count} akun. Pesan: {random_message}. Status Code: {status_code}")
 
 # Fungsi untuk menunggu hingga waktu tertentu (jam 2 pagi atau jam 2 sore) dengan hitungan mundur
-def wait_until_target_time(hour):
-    while True:
+def wait_until_target_time(hour_1, hour_2):
+    now_utc = datetime.utcnow()
+    now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
+    
+    target_time_1 = now_wib.replace(hour=hour_1, minute=0, second=0, microsecond=0)
+    target_time_2 = now_wib.replace(hour=hour_2, minute=0, second=0, microsecond=0)
+    
+    if now_wib > target_time_1:
+        target_time_1 += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
+    if now_wib > target_time_2:
+        target_time_2 += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
+
+    target_time = min(target_time_1, target_time_2)
+    
+    time_to_wait = (target_time - now_wib).total_seconds()
+    
+    while time_to_wait > 0:
+        # Hitungan mundur ditampilkan setiap detik
+        hours, remainder = divmod(time_to_wait, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        print(f"Menunggu hingga jam {target_time.hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
+        time.sleep(1)
+        
         now_utc = datetime.utcnow()
         now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
-        target_time = now_wib.replace(hour=hour, minute=0, second=0, microsecond=0)
-        
-        if now_wib > target_time:
-            target_time += timedelta(days=1)  # Jika sudah melewati jam target, tunggu besoknya
-        
         time_to_wait = (target_time - now_wib).total_seconds()
-        
-        while time_to_wait > 0:
-            # Hitungan mundur ditampilkan setiap detik
-            hours, remainder = divmod(time_to_wait, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            print(f"Menunggu hingga jam {hour}:00 WIB... {int(hours)} jam {int(minutes)} menit {int(seconds)} detik lagi.", end='\r')
-            time.sleep(1)
-            
-            now_utc = datetime.utcnow()
-            now_wib = now_utc + timedelta(hours=7)  # Mengubah waktu UTC menjadi WIB
-            time_to_wait = (target_time - now_wib).total_seconds()
 
-        print(f"Menunggu hingga jam {hour}:00 WIB... 0 jam 0 menit 0 detik lagi.                    ")
-
-        if time_to_wait <= 0:
-            break
+    print(f"Menunggu hingga jam {target_time.hour}:00 WIB... 0 jam 0 menit 0 detik lagi.                    ")
 
 # Fungsi untuk menjalankan tugas sesuai dengan jadwal
 def run_task(min_value, max_value):
     while True:
-        wait_until_target_time(2)  # Menunggu hingga jam 2 pagi WIB
-        print("\nMenunggu tambahan 3 menit...\n")
-        time.sleep(180)  # Menunggu tambahan 3 menit
-        send_random_messages_for_all_accounts(min_value, max_value)
-        
-        wait_until_target_time(14)  # Menunggu hingga jam 2 sore WIB
+        wait_until_target_time(2, 14)  # Menunggu hingga jam 2 pagi atau 2 sore WIB yang terdekat
         print("\nMenunggu tambahan 3 menit...\n")
         time.sleep(180)  # Menunggu tambahan 3 menit
         send_random_messages_for_all_accounts(min_value, max_value)
